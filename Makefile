@@ -7,7 +7,7 @@ CFLAGS = -W -Wall
 NVCCFLAGS = -g -G --use_fast_math
 
 #files
-OBJECTS = main.o
+OBJECTS = main.o radiator.o utils.o
 CU_OBJECTS =
 CU_SOURCES = 
 

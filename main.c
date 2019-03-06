@@ -1,15 +1,19 @@
-#include <stdio.h>
+//#include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
-#include <string.h>
-#include <sys/time.h>
+//#include <string.h>
+//#include <sys/time.h>
+#include "findiff.h"
+#include "radiator.h"
 
 int main(int argc, char **argv){
 	int m = 32, n = 32, p = 10;
-	int t = 0, w = 0, option = 0;
+	int t = 0, w = 0, a = 0, option = 0;
+	float **uold, **unew;
+	float *uold_vals, *unew_vals, *uoldGPU, *unewGPU;
 	struct timeval start, end;
 
-	while((option=getopt(argc,argv,"n:m:b:rtwp"))!=-1){
+	while((option=getopt(argc,argv,"n:m:p:taw"))!=-1){
 		switch(option){
 			case 'n': n = atoi(optarg);
 				break;
@@ -18,6 +22,8 @@ int main(int argc, char **argv){
 			case 'p': p = atoi(optarg);
 				break;
 			case 't': t = 1;
+				break;
+			case 'a': a = 1;
 				break;
 			case 'w': w = 1;	// to write results to file //
 				break;
@@ -30,6 +36,24 @@ int main(int argc, char **argv){
 		printf("Too many arguments provided, exiting!\n");
 		return 1;
 	}
+	
+	uold = (float**)malloc(n*sizeof(float*);
+	unew = (float**)malloc(n*sizeof(float*);
+	uold_vals = (float*)calloc(n*m,sizeof(float));
+	uold_vals = (float*)calloc(n*m,sizeof(float));
+	
+	init_mar(uold, uold_vals, n, m);	
+	init_mar(unew, uold_vals, n, m);	
+	
+	apply_bounds(unew, n, 2, &fleft, &fright, &fzero, &fzero);
+	apply_bounds(uold, n, 2, &fleft, &fright, &fzero, &fzero);
+
+	iterate(uold, unew, p, n, m);
+
+	print_grid(unew, n, m);
+
+	free(uold); free(unew);
+	free(uold_vals); free(unew_vals);
 
 	return 0;
 }
