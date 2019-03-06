@@ -13,7 +13,7 @@ CU_SOURCES =
 
 TARGET = prog
 
-all: $(OBJECTS) cu_objs
+all: $(OBJECTS) #cu_objs
 	$(NVCC) $(OBJECTS) $(CU_OBJECTS) -o $(TARGET)
 
 cu_objs: $(CU_SOURCES)
