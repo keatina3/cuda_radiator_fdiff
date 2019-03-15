@@ -7,7 +7,7 @@
 #include "findiff.h"
 #include "radiator.h"
 
-extern void fd_iterate_gpu(float* u_vals, int block_size, int n, int m, int p, float* tau);
+extern void fd_iterate_gpu(float* u_vals, int block_size_X, int block_size_Y, int n, int m, int p, Tau* tau);
 
 int main(int argc, char **argv){
 	int m = 32, n = 32, p = 10;
@@ -15,6 +15,7 @@ int main(int argc, char **argv){
 	float **uold, **unew;
 	float *uold_vals, *unew_vals, *uoldGPU, *unewGPU;
 	struct timeval start, end;
+	Tau tau;
 
 	while((option=getopt(argc,argv,"n:m:p:taw"))!=-1){
 		switch(option){
