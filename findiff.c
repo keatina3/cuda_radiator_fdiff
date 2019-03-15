@@ -26,27 +26,38 @@ void apply_bounds(float **u, int nx, int ny,
 
 void iterate(float **uold, float **unew, int p, int nx, int ny){
 	int i,j,k;
+	float **tmp;
 
 	for(k=0;k<p;k++){
 		for(i=0;i<nx;i++){
-			for(j=0;j<ny;j++){
-				unew[i][j] = 1.9*uold[i][(j-2)%ny] + 1.5*uold[i][(j-1)%ny] + uold[i][j]
-							+ 0.5*uold[i][(j+1)%ny] + 0.1*uold[i][(j+2)%ny];
+			for(j=2;j<ny;j++){
+				unew[i][j] = (1.9*uold[i][(j-2)%ny] + 1.5*uold[i][(j-1)%ny] + uold[i][j] + 0.5*uold[i][(j+1)%ny] + 0.1*uold[i][(j+2)%ny]) ;
 				unew[i][j] /= (float)(5.0);
 			}
 		}
+		tmp = uold;
+		uold = unew;
+		unew = tmp;
 	}
+	unew=uold;
 }
 
 float get_grid_avg(float **u, int nx, int ny){
 	float *row_sum, temp;
-	row_sum = (float*)calloc(nx, sizeof(float));
-	tmp = vec_reduce(row_sum, nx);
+	
+	row_sum = (float*)calloc(nx,sizeof(float));
+	sum_rows(u, row_sum, nx, ny);
+	temp = vec_reduce(row_sum, nx);
 	free(row_sum);
 	
 	return temp;
 }
 
 void print_grid(float **u, int nx, int ny){
-
+	int i,j;
+	for(i=0;i<nx;i++){
+		for(j=0;j<ny;j++)
+			printf("%f ", u[i][j]);
+		printf("\n");
+	}
 }

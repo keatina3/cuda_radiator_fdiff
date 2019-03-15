@@ -1,10 +1,13 @@
-//#include <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
 //#include <string.h>
 //#include <sys/time.h>
+#include "utils.h"
 #include "findiff.h"
 #include "radiator.h"
+
+extern void fd_iterate_gpu(float* u_vals, int block_size, int n, int m, int p, float* tau);
 
 int main(int argc, char **argv){
 	int m = 32, n = 32, p = 10;
@@ -37,18 +40,20 @@ int main(int argc, char **argv){
 		return 1;
 	}
 	
-	uold = (float**)malloc(n*sizeof(float*);
-	unew = (float**)malloc(n*sizeof(float*);
+	uold = (float**)malloc(n*sizeof(float*));
+	unew = (float**)malloc(n*sizeof(float*));
 	uold_vals = (float*)calloc(n*m,sizeof(float));
-	uold_vals = (float*)calloc(n*m,sizeof(float));
+	unew_vals = (float*)calloc(n*m,sizeof(float));
 	
-	init_mar(uold, uold_vals, n, m);	
-	init_mar(unew, uold_vals, n, m);	
+	init_mat(uold, uold_vals, n, m);	
+	init_mat(unew, uold_vals, n, m);	
 	
 	apply_bounds(unew, n, 2, &fleft, &fright, &fzero, &fzero);
 	apply_bounds(uold, n, 2, &fleft, &fright, &fzero, &fzero);
 
 	iterate(uold, unew, p, n, m);
+
+	get_grid_avg(unew, n, m);
 
 	print_grid(unew, n, m);
 

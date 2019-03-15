@@ -3,11 +3,11 @@ CC = gcc
 NVCC = nvcc
 
 #flags 
-CFLAGS = -W -Wall
+CFLAGS = -Wall
 NVCCFLAGS = -g -G --use_fast_math
 
 #files
-OBJECTS = main.o radiator.o utils.o
+OBJECTS = main.o findiff.o radiator.o utils.o
 CU_OBJECTS =
 CU_SOURCES = 
 
