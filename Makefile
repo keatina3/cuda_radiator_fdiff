@@ -8,12 +8,12 @@ NVCCFLAGS = -g -G --use_fast_math
 
 #files
 OBJECTS = main.o findiff.o radiator.o utils.o
-CU_OBJECTS =
-CU_SOURCES = 
+CU_OBJECTS = findiff_gpu.o
+CU_SOURCES = findiff_gpu.cu
 
 TARGET = prog
 
-all: $(OBJECTS) #cu_objs
+all: $(OBJECTS) cu_objs
 	$(NVCC) $(OBJECTS) $(CU_OBJECTS) -o $(TARGET)
 
 cu_objs: $(CU_SOURCES)

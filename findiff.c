@@ -39,7 +39,7 @@ void iterate(float **uold, float **unew, int p, int nx, int ny){
 		uold = unew;
 		unew = tmp;
 	}
-	unew=uold;
+	//unew=uold;
 }
 
 float get_grid_avg(float **u, int nx, int ny){

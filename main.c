@@ -7,7 +7,12 @@
 #include "findiff.h"
 #include "radiator.h"
 
+#define BLOCK_SIZE 32
+
 extern void fd_iterate_gpu(float* u_vals, int block_size_X, int block_size_Y, int n, int m, int p, Tau* tau);
+
+extern int block_size_X = BLOCK_SIZE;
+extern int block_size_Y = 1;
 
 int main(int argc, char **argv){
 	int m = 32, n = 32, p = 10;
