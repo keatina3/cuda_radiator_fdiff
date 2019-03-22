@@ -7,7 +7,7 @@ typedef struct {
 	float transf_GPU;
 	float calc_GPU;
 	float calc_avg;
-	float trasf_RAM;
+	float transf_RAM;
 } Tau;
 
 void init_mat(float **u_ptr, float *u_vals, int m, int n);

@@ -1,24 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
-//#include <string.h>
-//#include <sys/time.h>
+#include <string.h>
+#include <sys/time.h>
 #include "utils.h"
 #include "findiff.h"
 #include "radiator.h"
 
-#define BLOCK_SIZE 32
-
-extern void fd_iterate_gpu(float* u_vals, int block_size_X, int block_size_Y, int n, int m, int p, Tau* tau);
-
-extern int block_size_X = BLOCK_SIZE;
-extern int block_size_Y = 1;
+//extern void fdiff_gpu(float* u_vals, int n, int m, int p, Tau * tau);
+//extern void fdiff_gpu_slow(float* u_vals, int n, int m, int p, Tau* tau);
 
 int main(int argc, char **argv){
 	int m = 32, n = 32, p = 10;
 	int t = 0, w = 0, a = 0, option = 0;
 	float **uold, **unew;
-	float *uold_vals, *unew_vals, *uoldGPU, *unewGPU;
+	float *uold_vals, *unew_vals, *uGPU;
 	struct timeval start, end;
 	Tau tau;
 
@@ -50,20 +46,28 @@ int main(int argc, char **argv){
 	unew = (float**)malloc(n*sizeof(float*));
 	uold_vals = (float*)calloc(n*m,sizeof(float));
 	unew_vals = (float*)calloc(n*m,sizeof(float));
+	uGPU = (float*)calloc(n*m,sizeof(float));
 	
 	init_mat(uold, uold_vals, n, m);	
-	init_mat(unew, uold_vals, n, m);	
+	init_mat(unew, unew_vals, n, m);	
 	
 	apply_bounds(unew, n, 2, &fleft, &fright, &fzero, &fzero);
 	apply_bounds(uold, n, 2, &fleft, &fright, &fzero, &fzero);
+   
+    memcpy(uGPU, unew_vals, n*m*sizeof(float));
+    print_grid(uGPU, n, m);
 
+    fdiff_gpu(uGPU, n, m, p, &tau);
 	iterate(uold, unew, p, n, m);
-
 	get_grid_avg(unew, n, m);
-
-	print_grid(unew, n, m);
+    
+	printf("\n\n\n");
+    print_grid(unew_vals, n, m);
+	printf("\n\n\n");
+    print_grid(uGPU, n, m);
 
 	free(uold); free(unew);
+    free(uGPU);
 	free(uold_vals); free(unew_vals);
 
 	return 0;
