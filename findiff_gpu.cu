@@ -14,23 +14,23 @@ __device__ void calc_iterate(float *unew, float *uold, int n, int m, int idx, in
 	__syncthreads();
 }
 
-__device__ void glob_shared_cpy(float *u_glob, float *unew, float *uold, int n, int m, int idx, int idy, int ind, int block_size_Y){
+__device__ void glob_shared_cpy(float *u_glob, float *unew, float *uold, int pitch, int n, int m, int idx, int idy, int ind, int block_size_Y){
 	// READING DATA FROM GLOBAL MEMORY TO SHARED //
     if(idy<m){
 		if(idx<n){
 			if(threadIdx.y==0 && 0<blockIdx.y){
-				unew[ind-2] = u_glob[(idy-2) + idx*m];
-				unew[ind-1] = u_glob[(idy-1) + idx*m];	
+				unew[ind-2] = u_glob[(idy-2) + idx*pitch];
+				unew[ind-1] = u_glob[(idy-1) + idx*pitch];	
 				uold[ind-2] = unew[ind-2];
 				uold[ind-1] = unew[ind-1];
 			}
 
-			unew[ind] = u_glob[idy+idx*m];
+			unew[ind] = u_glob[idy+idx*pitch];
 			uold[ind] = unew[ind];
 			
 			if(threadIdx.y==(block_size_Y-1)){
-				unew[ind+1] = u_glob[(idy+1)%m + idx*m];
-				unew[ind+2] = u_glob[(idy+2)%m + idx*m];
+				unew[ind+1] = u_glob[(idy+1)%m + idx*pitch];
+				unew[ind+2] = u_glob[(idy+2)%m + idx*pitch];
 				uold[ind+1] = unew[ind+1];
 				uold[ind+2] = unew[ind+2];
 			}
@@ -40,13 +40,13 @@ __device__ void glob_shared_cpy(float *u_glob, float *unew, float *uold, int n, 
      //   printf("TESTVAL = %f, index = %d, blockwidth = %d, u_glob[0]=%f\n", unew[ind+2], ind, block_size_Y, u_glob[8]); 
 }
 
-__device__ void shared_glob_cpy(float *u_glob, float *unew, int n, int m, int idx, int idy, int ind){
+__device__ void shared_glob_cpy(float *u_glob, float *unew, int pitch, int n, int m, int idx, int idy, int ind){
     if(1<idy && idy<m)
 		if(idx<n)
-		    u_glob[idy+idx*m] = unew[ind];
+		    u_glob[idy+idx*pitch] = unew[ind];
 }
 
-__global__ void iterate_gpu(float *u_glob, int n, int m){
+__global__ void iterate_gpu(float *u_glob, int pitch, int n, int m){
 	int idx = blockIdx.x*blockDim.x + threadIdx.x;
 	int idy = blockIdx.y*blockDim.y + threadIdx.y;
 	int ind = threadIdx.y + 2;
@@ -60,13 +60,13 @@ __global__ void iterate_gpu(float *u_glob, int n, int m){
 	//__shared__ float uold[block_size_Y+4];
     
 	// initialising shared memory //
-    glob_shared_cpy(u_glob, unew, uold, n, m, idx, idy, ind, block_size_Y);     
+    glob_shared_cpy(u_glob, unew, uold, pitch, n, m, idx, idy, ind, block_size_Y);     
     
     // iterating and updating unew //
 	calc_iterate(unew, uold, n, m, idx, idy, ind);
     
     // sending vals back to global mem //
-    shared_glob_cpy(u_glob, unew, n, m, idx, idy, ind);
+    shared_glob_cpy(u_glob, unew, pitch, n, m, idx, idy, ind);
 }
 
 __global__ void iterate_gpu_slow(float* unew_glob, float* uold_glob, int n, int m){
@@ -87,21 +87,23 @@ extern "C" {
 void fdiff_gpu(float *u_vals, int n, int m, int p, Tau* tau){
 	float *u_glob, row_avgs;
 	size_t u_glob_size;
-    int i;
+    int i, pitch;
 	
-    cudaMalloc( (void**)&u_glob, n*m*sizeof(float));
-    cudaMemcpy(u_glob, u_vals, n*m*sizeof(float), cudaMemcpyHostToDevice);
-    //cudaMallocPitch( (void**)&u_glob, &u_glob_size, (size_t)(m*sizeof(float)), n);
-	//cudaMemcpy2D(u_glob, u_glob_size, u_vals, m*sizeof(float), m*sizeof(float), n, cudaMemcpyHostToDevice);
-    
+    //cudaMalloc( (void**)&u_glob, n*m*sizeof(float));
+    //cudaMemcpy(u_glob, u_vals, n*m*sizeof(float), cudaMemcpyHostToDevice);
+    cudaMallocPitch( (void**)&u_glob, &u_glob_size, (size_t)(m*sizeof(float)), n);
+	cudaMemcpy2D(u_glob, u_glob_size, u_vals, m*sizeof(float), m*sizeof(float), n, cudaMemcpyHostToDevice);
+    pitch = (int)u_glob_size/sizeof(float);
+    // pitch = m;
+
     dim3 dimBlock(1, block_size_Y);
     dim3 dimGrid((n/dimBlock.x)+(!(n%dimBlock.x)?0:1), (m/dimBlock.y)+(!(m%dimBlock.y)?0:1));
    
     for(i=0;i<p;i++)
-	    iterate_gpu<<<dimGrid,dimBlock,2*(block_size_Y+4)*sizeof(float)>>>(u_glob, n, m);
+	    iterate_gpu<<<dimGrid,dimBlock,2*(block_size_Y+4)*sizeof(float)>>>(u_glob, pitch, n, m);
     
-    cudaMemcpy(u_vals, u_glob, n*m*sizeof(float), cudaMemcpyDeviceToHost);
-    //cudaMemcpy2D(u_vals, m*sizeof(float), u_glob, u_glob_size, m*sizeof(float), n, cudaMemcpyDeviceToHost);
+    //cudaMemcpy(u_vals, u_glob, n*m*sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy2D(u_vals, m*sizeof(float), u_glob, u_glob_size, m*sizeof(float), n, cudaMemcpyDeviceToHost);
 	cudaFree(u_glob);
 }
 
