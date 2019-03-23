@@ -46,7 +46,7 @@ float get_grid_avg(float **u, int nx, int ny){
 	float *row_sum, temp;
 	
 	row_sum = (float*)calloc(nx,sizeof(float));
-	sum_rows(u, row_sum, nx, ny);
+	red_rows(u, row_sum, nx, ny);
 	temp = vec_reduce(row_sum, nx);
 	free(row_sum);
 	
