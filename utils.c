@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <math.h>
 #include "utils.h"
 
 void init_mat(float **u_ptr, float *u_vals, int n, int m){
@@ -8,11 +7,11 @@ void init_mat(float **u_ptr, float *u_vals, int n, int m){
 		u_ptr[i]=&u_vals[i*m];
 }
 
-void red_rows(float **A, float *b, int n, int m){
+void red_rows(float *A, float *b, int n, int m){
 	int i,j;
 	for(i=0;i<n;i++)
 		for(j=0;j<m;j++)
-			b[i] += fabs(A[i][j]);
+			b[i] += A[j+i*m];
 }
 
 float vec_reduce(float *vec, int n){

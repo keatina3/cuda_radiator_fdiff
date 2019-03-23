@@ -1,0 +1,287 @@
+========= CUDA-MEMCHECK
+========= Invalid __global__ read of size 4
+=========     at 0x000006e8 in /home/users/mschpc/2018/keatina3/5615/Assignments/Assignment_2/findiff_gpu.cu:106:red_rows_glob(float*, float*, int, int, int)
+=========     by thread (15,4,0) in block (0,0,0)
+=========     Address 0x7045402a8 is out of bounds
+=========     Saved host backtrace up to driver entry point at kernel launch time
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 (cuLaunchKernel + 0x2cd) [0x24d9dd]
+=========     Host Frame:./prog [0x21442]
+=========     Host Frame:./prog [0x21637]
+=========     Host Frame:./prog [0x559f5]
+=========     Host Frame:./prog [0x56d2]
+=========     Host Frame:./prog [0x54f7]
+=========     Host Frame:./prog [0x5551]
+=========     Host Frame:./prog [0x4d4a]
+=========     Host Frame:./prog [0x3a4a]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Invalid __global__ read of size 4
+=========     at 0x000006e8 in /home/users/mschpc/2018/keatina3/5615/Assignments/Assignment_2/findiff_gpu.cu:106:red_rows_glob(float*, float*, int, int, int)
+=========     by thread (15,3,0) in block (0,0,0)
+=========     Address 0x7045402a8 is out of bounds
+=========     Saved host backtrace up to driver entry point at kernel launch time
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 (cuLaunchKernel + 0x2cd) [0x24d9dd]
+=========     Host Frame:./prog [0x21442]
+=========     Host Frame:./prog [0x21637]
+=========     Host Frame:./prog [0x559f5]
+=========     Host Frame:./prog [0x56d2]
+=========     Host Frame:./prog [0x54f7]
+=========     Host Frame:./prog [0x5551]
+=========     Host Frame:./prog [0x4d4a]
+=========     Host Frame:./prog [0x3a4a]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Invalid __global__ read of size 4
+=========     at 0x000006e8 in /home/users/mschpc/2018/keatina3/5615/Assignments/Assignment_2/findiff_gpu.cu:106:red_rows_glob(float*, float*, int, int, int)
+=========     by thread (15,2,0) in block (0,0,0)
+=========     Address 0x7045402a8 is out of bounds
+=========     Saved host backtrace up to driver entry point at kernel launch time
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 (cuLaunchKernel + 0x2cd) [0x24d9dd]
+=========     Host Frame:./prog [0x21442]
+=========     Host Frame:./prog [0x21637]
+=========     Host Frame:./prog [0x559f5]
+=========     Host Frame:./prog [0x56d2]
+=========     Host Frame:./prog [0x54f7]
+=========     Host Frame:./prog [0x5551]
+=========     Host Frame:./prog [0x4d4a]
+=========     Host Frame:./prog [0x3a4a]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Invalid __global__ read of size 4
+=========     at 0x000006e8 in /home/users/mschpc/2018/keatina3/5615/Assignments/Assignment_2/findiff_gpu.cu:106:red_rows_glob(float*, float*, int, int, int)
+=========     by thread (15,1,0) in block (0,0,0)
+=========     Address 0x7045402a8 is out of bounds
+=========     Saved host backtrace up to driver entry point at kernel launch time
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 (cuLaunchKernel + 0x2cd) [0x24d9dd]
+=========     Host Frame:./prog [0x21442]
+=========     Host Frame:./prog [0x21637]
+=========     Host Frame:./prog [0x559f5]
+=========     Host Frame:./prog [0x56d2]
+=========     Host Frame:./prog [0x54f7]
+=========     Host Frame:./prog [0x5551]
+=========     Host Frame:./prog [0x4d4a]
+=========     Host Frame:./prog [0x3a4a]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Invalid __global__ read of size 4
+=========     at 0x000006e8 in /home/users/mschpc/2018/keatina3/5615/Assignments/Assignment_2/findiff_gpu.cu:106:red_rows_glob(float*, float*, int, int, int)
+=========     by thread (15,0,0) in block (0,0,0)
+=========     Address 0x7045402a8 is out of bounds
+=========     Saved host backtrace up to driver entry point at kernel launch time
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 (cuLaunchKernel + 0x2cd) [0x24d9dd]
+=========     Host Frame:./prog [0x21442]
+=========     Host Frame:./prog [0x21637]
+=========     Host Frame:./prog [0x559f5]
+=========     Host Frame:./prog [0x56d2]
+=========     Host Frame:./prog [0x54f7]
+=========     Host Frame:./prog [0x5551]
+=========     Host Frame:./prog [0x4d4a]
+=========     Host Frame:./prog [0x3a4a]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Program hit cudaErrorLaunchFailure (error 4) due to "unspecified launch failure" on CUDA API call to cudaEventSynchronize. 
+=========     Saved host backtrace up to driver entry point at error
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 [0x351c13]
+=========     Host Frame:./prog [0x5020e]
+=========     Host Frame:./prog [0x4d6c]
+=========     Host Frame:./prog [0x3a4a]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Program hit cudaErrorLaunchFailure (error 4) due to "unspecified launch failure" on CUDA API call to cudaEventElapsedTime. 
+=========     Saved host backtrace up to driver entry point at error
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 [0x351c13]
+=========     Host Frame:./prog [0x4fecc]
+=========     Host Frame:./prog [0x4d8a]
+=========     Host Frame:./prog [0x3a4a]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Program hit cudaErrorLaunchFailure (error 4) due to "unspecified launch failure" on CUDA API call to cudaMemcpy. 
+=========     Saved host backtrace up to driver entry point at error
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 [0x351c13]
+=========     Host Frame:./prog [0x41b1f]
+=========     Host Frame:./prog [0x4dd4]
+=========     Host Frame:./prog [0x3a4a]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Program hit cudaErrorLaunchFailure (error 4) due to "unspecified launch failure" on CUDA API call to cudaMemcpy. 
+=========     Saved host backtrace up to driver entry point at error
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 [0x351c13]
+=========     Host Frame:./prog [0x41b1f]
+=========     Host Frame:./prog [0x4dd4]
+=========     Host Frame:./prog [0x3a4a]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Program hit cudaErrorLaunchFailure (error 4) due to "unspecified launch failure" on CUDA API call to cudaMemcpy. 
+=========     Saved host backtrace up to driver entry point at error
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 [0x351c13]
+=========     Host Frame:./prog [0x41b1f]
+=========     Host Frame:./prog [0x4dd4]
+=========     Host Frame:./prog [0x3a4a]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Program hit cudaErrorLaunchFailure (error 4) due to "unspecified launch failure" on CUDA API call to cudaMemcpy. 
+=========     Saved host backtrace up to driver entry point at error
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 [0x351c13]
+=========     Host Frame:./prog [0x41b1f]
+=========     Host Frame:./prog [0x4dd4]
+=========     Host Frame:./prog [0x3a4a]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Program hit cudaErrorLaunchFailure (error 4) due to "unspecified launch failure" on CUDA API call to cudaMemcpy. 
+=========     Saved host backtrace up to driver entry point at error
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 [0x351c13]
+=========     Host Frame:./prog [0x41b1f]
+=========     Host Frame:./prog [0x4dd4]
+=========     Host Frame:./prog [0x3a4a]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Program hit cudaErrorLaunchFailure (error 4) due to "unspecified launch failure" on CUDA API call to cudaMemcpy. 
+=========     Saved host backtrace up to driver entry point at error
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 [0x351c13]
+=========     Host Frame:./prog [0x41b1f]
+=========     Host Frame:./prog [0x4dd4]
+=========     Host Frame:./prog [0x3a4a]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Program hit cudaErrorLaunchFailure (error 4) due to "unspecified launch failure" on CUDA API call to cudaMemcpy. 
+=========     Saved host backtrace up to driver entry point at error
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 [0x351c13]
+=========     Host Frame:./prog [0x41b1f]
+=========     Host Frame:./prog [0x4dd4]
+=========     Host Frame:./prog [0x3a4a]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Program hit cudaErrorLaunchFailure (error 4) due to "unspecified launch failure" on CUDA API call to cudaMemcpy. 
+=========     Saved host backtrace up to driver entry point at error
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 [0x351c13]
+=========     Host Frame:./prog [0x41b1f]
+=========     Host Frame:./prog [0x4dd4]
+=========     Host Frame:./prog [0x3a4a]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Program hit cudaErrorLaunchFailure (error 4) due to "unspecified launch failure" on CUDA API call to cudaMemcpy. 
+=========     Saved host backtrace up to driver entry point at error
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 [0x351c13]
+=========     Host Frame:./prog [0x41b1f]
+=========     Host Frame:./prog [0x4dd4]
+=========     Host Frame:./prog [0x3a4a]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Program hit cudaErrorLaunchFailure (error 4) due to "unspecified launch failure" on CUDA API call to cudaMemcpy. 
+=========     Saved host backtrace up to driver entry point at error
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 [0x351c13]
+=========     Host Frame:./prog [0x41b1f]
+=========     Host Frame:./prog [0x4dd4]
+=========     Host Frame:./prog [0x3a4a]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Program hit cudaErrorLaunchFailure (error 4) due to "unspecified launch failure" on CUDA API call to cudaMemcpy. 
+=========     Saved host backtrace up to driver entry point at error
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 [0x351c13]
+=========     Host Frame:./prog [0x41b1f]
+=========     Host Frame:./prog [0x4dd4]
+=========     Host Frame:./prog [0x3a4a]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Program hit cudaErrorLaunchFailure (error 4) due to "unspecified launch failure" on CUDA API call to cudaMemcpy. 
+=========     Saved host backtrace up to driver entry point at error
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 [0x351c13]
+=========     Host Frame:./prog [0x41b1f]
+=========     Host Frame:./prog [0x4dd4]
+=========     Host Frame:./prog [0x3a4a]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Program hit cudaErrorLaunchFailure (error 4) due to "unspecified launch failure" on CUDA API call to cudaMemcpy. 
+=========     Saved host backtrace up to driver entry point at error
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 [0x351c13]
+=========     Host Frame:./prog [0x41b1f]
+=========     Host Frame:./prog [0x4dd4]
+=========     Host Frame:./prog [0x3a4a]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Program hit cudaErrorLaunchFailure (error 4) due to "unspecified launch failure" on CUDA API call to cudaMemcpy. 
+=========     Saved host backtrace up to driver entry point at error
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 [0x351c13]
+=========     Host Frame:./prog [0x41b1f]
+=========     Host Frame:./prog [0x4dd4]
+=========     Host Frame:./prog [0x3a4a]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Program hit cudaErrorLaunchFailure (error 4) due to "unspecified launch failure" on CUDA API call to cudaMemcpy. 
+=========     Saved host backtrace up to driver entry point at error
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 [0x351c13]
+=========     Host Frame:./prog [0x41b1f]
+=========     Host Frame:./prog [0x4dd4]
+=========     Host Frame:./prog [0x3a4a]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Program hit cudaErrorLaunchFailure (error 4) due to "unspecified launch failure" on CUDA API call to cudaMemcpy. 
+=========     Saved host backtrace up to driver entry point at error
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 [0x351c13]
+=========     Host Frame:./prog [0x41b1f]
+=========     Host Frame:./prog [0x4dd4]
+=========     Host Frame:./prog [0x3a4a]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Program hit cudaErrorLaunchFailure (error 4) due to "unspecified launch failure" on CUDA API call to cudaFree. 
+=========     Saved host backtrace up to driver entry point at error
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 [0x351c13]
+=========     Host Frame:./prog [0x4d226]
+=========     Host Frame:./prog [0x4de6]
+=========     Host Frame:./prog [0x3a4a]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Program hit cudaErrorLaunchFailure (error 4) due to "unspecified launch failure" on CUDA API call to cudaFree. 
+=========     Saved host backtrace up to driver entry point at error
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 [0x351c13]
+=========     Host Frame:./prog [0x4d226]
+=========     Host Frame:./prog [0x4df2]
+=========     Host Frame:./prog [0x3a4a]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Program hit cudaErrorLaunchFailure (error 4) due to "unspecified launch failure" on CUDA API call to cudaEventCreate. 
+=========     Saved host backtrace up to driver entry point at error
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 [0x351c13]
+=========     Host Frame:./prog [0x5070e]
+=========     Host Frame:./prog [0x4442]
+=========     Host Frame:./prog [0x3ab3]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Program hit cudaErrorLaunchFailure (error 4) due to "unspecified launch failure" on CUDA API call to cudaEventCreate. 
+=========     Saved host backtrace up to driver entry point at error
+=========     Host Frame:/usr/lib/x86_64-linux-gnu/libcuda.so.1 [0x351c13]
+=========     Host Frame:./prog [0x5070e]
+=========     Host Frame:./prog [0x444e]
+=========     Host Frame:./prog [0x3ab3]
+=========     Host Frame:/lib/x86_64-linux-gnu/libc.so.6 (__libc_start_main + 0xf0) [0x20830]
+=========     Host Frame:./prog [0x34a9]
+=========
+========= Error: process didn't terminate successfully
+=========        The application may have hit an error when dereferencing Unified Memory from the host. Please rerun the application under cuda-gdb or Nsight Eclipse Edition to catch host side errors.
+========= No CUDA-MEMCHECK results found

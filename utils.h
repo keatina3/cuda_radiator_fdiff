@@ -11,7 +11,7 @@ typedef struct {
 } Tau;
 
 void init_mat(float **u_ptr, float *u_vals, int m, int n);
-void red_rows(float **u, float *t, int n, int m);
+void red_rows(float *u, float *t, int n, int m);
 float vec_reduce(float *vec, int n);
 float sse(float *a, float *b, int n);
 
