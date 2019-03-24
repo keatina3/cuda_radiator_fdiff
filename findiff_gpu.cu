@@ -1,5 +1,5 @@
-#include "utils.h"
 #include <stdio.h>
+#include "utils.h"
 #include "findiff_gpu.h"
 #include "findiff.h"
 
@@ -87,12 +87,6 @@ __global__ void red_rows(float* u_glob, float* u_glob_out, int pitch, int n, int
     
     disp = (1+blockIdx.y)*blockDim.y;
     i = (disp > m) ? (blockDim.y - (disp-m)):blockDim.y;
-    /*
-    if(idx==0 && idy ==0){
-        printf("shared[0,1,2] = %f, %f, %f, i=%d\n",tmp[0], tmp[1], tmp[2], i);
-        printf("m = %d, disp = %d, m mod disp = %d\n", m, disp, 6%3);
-    }
-    */
     for( ; i>1; i>>=1){
         if(ind<(i/2)){
             tmp[ind] += tmp[ind+(i/2)];
@@ -126,8 +120,8 @@ void fdiff_gpu(float *u_vals, float *temps, int n, int m, int p, int block_size_
     cudaEventCreate(&start);
     cudaEventCreate(&finish);
     
-    cudaEventRecord(start, 0);
     if(!mallocPitch){
+        cudaEventRecord(start, 0);
         cudaMalloc( (void**)&u_glob, n*m*sizeof(float));
         cudaEventRecord(finish, 0);
         cudaEventSynchronize(finish);
@@ -141,6 +135,7 @@ void fdiff_gpu(float *u_vals, float *temps, int n, int m, int p, int block_size_
         
         pitch = m;
     } else {
+        cudaEventRecord(start, 0);
         cudaMallocPitch( (void**)&u_glob, &u_glob_size, (size_t)(m*sizeof(float)), n);
         cudaEventRecord(finish, 0);
         cudaEventSynchronize(finish);
@@ -165,27 +160,29 @@ void fdiff_gpu(float *u_vals, float *temps, int n, int m, int p, int block_size_
     cudaEventRecord(finish, 0);
     cudaEventSynchronize(finish);
     cudaEventElapsedTime(&tau->calc_GPU, start, finish);
-    
-    cudaEventRecord(start, 0);
-    if(!mallocPitch)
+    printf("time taken = %f\n", tau->calc_GPU);
+
+    if(!mallocPitch){
+        cudaEventRecord(start, 0);
         cudaMemcpy(u_vals, u_glob, n*m*sizeof(float), cudaMemcpyDeviceToHost);
-    else
+    } else {
+        cudaEventRecord(start, 0);
         cudaMemcpy2D(u_vals, m*sizeof(float), u_glob, u_glob_size, m*sizeof(float), n, cudaMemcpyDeviceToHost);
+    }
     cudaEventRecord(finish, 0);
     cudaEventSynchronize(finish);
     cudaEventElapsedTime(&tau->transf_RAM, start, finish);
     
     if(red){  
-        cudaEventRecord(start, 0);
         m_tmp = m;
+        cudaEventRecord(start, 0);
         while(m_tmp > 1){
-            printf("m_tmp = %d\n", m_tmp);
             red_rows<<<dimGrid,dimBlock,dimBlock.y*sizeof(float)>>>(u_glob, u_glob, pitch, n, m_tmp);
             m_tmp = (m_tmp/dimBlock.y)+(!(m_tmp%dimBlock.y)?0:1);
         }
         cudaEventRecord(finish, 0);
         cudaEventSynchronize(finish);
-        cudaEventElapsedTime(&tau->calc_avg, start, finish);
+        cudaEventElapsedTime(&tau->calc_avgGPU, start, finish);
         
         if(!mallocPitch){
             for(i=0;i<n;i++)
@@ -251,7 +248,7 @@ void fdiff_gpu_glob(float* u_vals, float* temps, int n, int m, int p, int block_
             red_rows_glob<<<dimGrid,dimBlock>>>(tmp, tmp, m, n, m_tmp);
         cudaEventRecord(finish, 0);
         cudaEventSynchronize(finish);
-        cudaEventElapsedTime(&tau->calc_avg, start, finish);
+        cudaEventElapsedTime(&tau->calc_avgGPU, start, finish);
         for(i=0;i<n;i++)
             cudaMemcpy(&temps[i], &tmp[i*m], sizeof(float), cudaMemcpyDeviceToHost);
     }

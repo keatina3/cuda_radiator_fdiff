@@ -16,7 +16,7 @@ int main(int argc, char **argv){
 	float **uold, **unew;
 	float *u, *uold_vals, *unew_vals, *temps, *uGPU, *tempsGPU, *uglob_GPU, *tempsGPU2;
 	struct timeval start, end;
-	Tau tau1, tau2;
+	Tau tau_shared, tau_glob;
 
 	while((option=getopt(argc,argv,"n:m:p:b:tawsdg"))!=-1){
 		switch(option){
@@ -50,7 +50,9 @@ int main(int argc, char **argv){
 		return 1;
 	}
 	
-	uold = (float**)malloc(n*sizeof(float*));
+    ///////////////////////// SETUP //////////////////////////////////////
+	
+    uold = (float**)malloc(n*sizeof(float*));
 	unew = (float**)malloc(n*sizeof(float*));
 	uold_vals = (float*)calloc(n*m,sizeof(float));
 	unew_vals = (float*)calloc(n*m,sizeof(float));
@@ -68,48 +70,125 @@ int main(int argc, char **argv){
     
     memcpy(uGPU, unew_vals, n*m*sizeof(float));
     memcpy(uglob_GPU, unew_vals, n*m*sizeof(float));
+    //////////////////////////////////////////////////////////////////////
+    
+    ///////////////////////// SERIAL /////////////////////////////////////
     
     if(serial){
         gettimeofday(&start, NULL);
 	    iterate(uold, unew, p, n, m);
         gettimeofday(&end, NULL);
-        tau1.calc_CPU = tau2.calc_CPU = (end.tv_sec-start.tv_sec)*(1E6) + (end.tv_usec - start.tv_usec);
+        tau_shared.calc_CPU = (end.tv_sec-start.tv_sec)*(1E6) +(end.tv_usec - start.tv_usec);
+        tau_glob.calc_CPU = tau_shared.calc_CPU;
+        
         if(p%2==0)
             u = uold_vals;
         else
             u = unew_vals;
+        gettimeofday(&start, NULL);
 	    if(a)
             red_rows(u, temps, n, m);
+        gettimeofday(&end, NULL);
+        tau_shared.calc_avgCPU = (end.tv_sec-start.tv_sec)*(1E6) + (end.tv_usec - start.tv_usec);
+        tau_glob.calc_avgCPU = tau_shared.calc_avgCPU;
+        tau_shared.tot_CPU = tau_shared.calc_avgCPU + tau_shared.calc_CPU;
+        tau_glob.tot_CPU = tau_shared.tot_CPU;
+
 	    if(m <= 10 && n <= 10)
-            printf("\n\n====================== PRINTING SERIAL GRID ======================\n");
+            printf(MAG"\n\n=========================== PRINTING SERIAL GRID "
+                            "========================================\n\n" RESET);
         else
-            printf("\n\n================== PRINTING (%dx%d OF) SERIAL GRID ==================\n",10<n?10:n,10<m?10:m);
+            printf(MAG"\n\n===================== PRINTING (%dx%d) OF SERIAL GRID "
+                            "===================================\n\n"RESET,10<n?10:n,10<m?10:m);
         print_grid(u,10<n?10:n,10<m?10:m,m);
+        printf(MAG"=============================================================="
+                            "===========================\n\n"MAG);
     }
+    //////////////////////////////////////////////////////////////////////
 
-    if(glob){
-        fdiff_gpu_glob(uglob_GPU, tempsGPU2, n, m, p, block_size, &tau2, a);
-	    if(m <= 10 && n <= 10)
-            printf("\n\n====================== PRINTING GPU (GLOBAL METHOD) GRID ======================\n");
-        else
-            printf("\n\n================== PRINTING (%dx%d OF) GPU (GLOBAL METHOD) GRID ==================\n",10<n?10:n,10<m?10:m);
-        print_grid(uglob_GPU,10<n?10:n,10<m?10:m,m);
-    }
-
-    fdiff_gpu(uGPU, tempsGPU, n, m, p, block_size, &tau1, mallocPitch, a);
-	if(m <= 10 && n <= 10)
-        printf("\n\n====================== PRINTING GPU (SHARED METHOD)  GRID ======================\n");
-    else
-        printf("\n\n================== PRINTING (%dx%d OF) GPU (SHARED METHOD) GRID ==================\n",10<n?10:n,10<m?10:m);
-    print_grid(uGPU,10<n?10:n,10<m?10:m,m);
+    ///////////////////////// GLOBAL /////////////////////////////////////
     
-    float SSE = sse(temps, tempsGPU, n);
-    int i;
-    for(i=0;i<(n<10?n:10);i++){
-        printf("temps[%d] = %f, tempsGPU[%d] = %f, tempsGPUglob[%d]=%f\n",i,temps[i],i,tempsGPU[i],i,tempsGPU2[i]);
-    } 
-    printf("SSE of temps = %f\n",SSE);
+    if(glob){
+        gettimeofday(&start, NULL);
+        fdiff_gpu_glob(uglob_GPU, tempsGPU2, n, m, p, block_size, &tau_glob, a);
+        gettimeofday(&end, NULL);
+        tau_glob.tot_GPU = (end.tv_sec-start.tv_sec)*(1E6) + (end.tv_usec - start.tv_usec);
 
+	    if(m <= 10 && n <= 10)
+            printf(MAG"\n\n=========================== PRINTING GPU (GLOBAL METHOD) GRID "
+                            "===========================\n\n"RESET);
+        else
+            printf(MAG"\n\n===================== PRINTING (%dx%d) OF GPU (GLOBAL METHOD) GRID "
+                            "======================\n\n"RESET,10<n?10:n,10<m?10:m);
+        print_grid(uglob_GPU,10<n?10:n,10<m?10:m,m);
+        printf(MAG"=============================================================="
+                            "===========================\n\n"RESET);
+    }
+    //////////////////////////////////////////////////////////////////////
+    
+    ///////////////////////// SHARED /////////////////////////////////////
+    
+    gettimeofday(&start, NULL);
+    fdiff_gpu(uGPU, tempsGPU, n, m, p, block_size, &tau_shared, mallocPitch, a);
+    gettimeofday(&end, NULL);
+    tau_shared.tot_GPU = (end.tv_sec-start.tv_sec)*(1E6) + (end.tv_usec - start.tv_usec);
+
+	if(m <= 10 && n <= 10)
+        printf(MAG"\n\n=========================== PRINTING GPU (SHAMAG METHOD) GRID "
+                            "===========================\n\n"RESET);
+    else
+        printf(MAG"\n\n===================== PRINTING (%dx%d) OF GPU (SHARED METHOD) GRID " 
+                            "======================\n\n"RESET,10<n?10:n,10<m?10:m);
+    print_grid(uGPU,10<n?10:n,10<m?10:m,m);
+    printf(MAG"=============================================================="
+                            "===========================\n\n"RESET);
+    //////////////////////////////////////////////////////////////////////
+    
+    ///////////////////////// RESULTS ////////////////////////////////////
+    
+    if(t){
+        printf(MAG"\n========================= RESULTS ==========================\n\n"RESET);
+        
+        printf(GREEN"Using shared memory...\n"RESET);
+        printf(RED"\t\tGPU time\tCPU time\tSpeedup\n"RESET);
+        printf(BLUE"Fin diff calc:"RESET"\t%0.6f\t%0.6f\t%0.6f\n", tau_shared.calc_GPU, 
+                        tau_shared.calc_CPU, tau_shared.calc_CPU/tau_shared.calc_GPU);
+        if(a){printf(BLUE"Get avgs calc:"RESET"\t%0.6f\t%0.6f\t%0.6f\n", tau_shared.calc_avgGPU, 
+                        tau_shared.calc_avgCPU, tau_shared.calc_avgCPU/tau_shared.calc_avgGPU);}
+        printf(BLUE"Total time:"RESET"\t%0.6f\t%0.6f\t%0.6f\n", tau_shared.tot_GPU, 
+                        tau_shared.tot_CPU, tau_shared.tot_CPU/tau_shared.tot_GPU);
+        printf(BLUE"Alloc on GPU:"RESET"\t%0.6f\n",tau_shared.alloc_GPU);
+        printf(BLUE"Transf RAM/GPU:"RESET"\t%0.6f\t%0.6f\n",tau_shared.transf_RAM, 
+                        tau_shared.transf_GPU);
+
+        if(glob){
+            printf(GREEN"\nUsing global memory...\n"RESET);
+            printf(RED"\t\tGPU(shared)\tGPU(glob)\tSpeedup\n"RESET);
+            printf(BLUE"Fin diff calc:"RESET"\t%0.6f\t%0.6f\t%0.6f\n", tau_shared.calc_GPU, 
+                        tau_glob.calc_GPU, tau_glob.calc_GPU/tau_shared.calc_GPU);
+            if(a){printf(BLUE"Get avgs calc:"RESET"\t%0.6f\t%0.6f\t%0.6f\n", 
+                                tau_shared.calc_avgGPU, tau_glob.calc_avgGPU, 
+                                tau_glob.calc_avgGPU/tau_shared.calc_avgGPU);}
+            printf(BLUE"Total time:"RESET"\t%0.6f\t%0.6f\t%0.6f\n", tau_shared.tot_GPU, 
+                        tau_glob.tot_GPU, tau_glob.tot_GPU/tau_shared.tot_GPU);
+            printf(BLUE"Alloc on GPU:"RESET"\t%0.6f\t%0.6f\t%0.6f\n",tau_shared.alloc_GPU, 
+                        tau_glob.alloc_GPU, tau_glob.alloc_GPU/tau_shared.alloc_GPU);
+            printf(BLUE"Transfer GPU:"RESET"\t%0.6f\t%0.6f\t%0.6f\n",tau_shared.transf_GPU, 
+                        tau_glob.transf_GPU, tau_glob.transf_GPU/tau_shared.transf_GPU);
+            printf(BLUE"Transfer RAM:"RESET"\t%0.6f\t%0.6f\t%0.6f\n",tau_shared.transf_RAM, 
+                        tau_glob.transf_RAM, tau_glob.transf_RAM/tau_shared.transf_RAM);
+        }
+
+        float SSEt = sse(temps, tempsGPU, n);
+        float SSE = sse(u, uGPU, m*n);
+        printf(GREEN"\nSSE vals...\n"RESET);
+        printf(BLUE"Overall SSE:"RESET"\t%0.8f\n",SSE);
+        printf(BLUE"SSE of temp:"RESET"\t%0.8f\n",SSEt);
+        
+        printf(MAG"=============================================================\n\n"RESET);
+    }
+    //////////////////////////////////////////////////////////////////////
+    
 	free(uold); free(unew);
     free(temps); free(tempsGPU); free(tempsGPU2);
     free(uGPU); free(uglob_GPU);
