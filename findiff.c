@@ -43,7 +43,7 @@ void iterate(float **uold, float **unew, int p, int nx, int ny){
     unew=uold; 
 }
 
-float get_grid_avg(float **u, int nx, int ny){
+float get_grid_avg(float *u, int nx, int ny){
 	float *row_sum, temp;
 	
 	row_sum = (float*)calloc(nx,sizeof(float));
@@ -54,11 +54,11 @@ float get_grid_avg(float **u, int nx, int ny){
 	return temp;
 }
 
-void print_grid(float *u, int nx, int ny){
+void print_grid(float *u, int nx, int ny, int offset){
 	int i,j;
 	for(i=0;i<nx;i++){
 		for(j=0;j<ny;j++)
-			printf("%f ", u[j+i*ny]);
+			printf("%f ", u[j+i*offset]);
 		printf("\n");
 	}
 }

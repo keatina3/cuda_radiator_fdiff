@@ -1,6 +1,7 @@
 #include "utils.h"
 #include <stdio.h>
 #include "findiff_gpu.h"
+#include "findiff.h"
 
 __device__ void calc_iterate(float *unew, float *uold, int n, int m, int idx, int idy, int ind){
 	if(1<idy && idy<m){
@@ -82,10 +83,16 @@ __global__ void red_rows(float* u_glob, float* u_glob_out, int pitch, int n, int
     int i, disp;
 
     if(idy<m && idx<n)
-        tmp[ind] = u_glob[idy+idx*pitch];         
-
+        tmp[ind] = u_glob[idy+idx*pitch];
+    
     disp = (1+blockIdx.y)*blockDim.y;
-    i = disp > m ? (blockDim.y - disp%m):blockDim.y;
+    i = (disp > m) ? (blockDim.y - (disp-m)):blockDim.y;
+    /*
+    if(idx==0 && idy ==0){
+        printf("shared[0,1,2] = %f, %f, %f, i=%d\n",tmp[0], tmp[1], tmp[2], i);
+        printf("m = %d, disp = %d, m mod disp = %d\n", m, disp, 6%3);
+    }
+    */
     for( ; i>1; i>>=1){
         if(ind<(i/2)){
             tmp[ind] += tmp[ind+(i/2)];
@@ -104,9 +111,9 @@ __global__ void red_rows_glob(float* u_glob, float* u_glob_out, int pitch, int n
 
     if(idy < (m/2) && idx < n){
         u_glob_out[idy + idx*pitch] += u_glob[idy + (m/2) + idx*pitch];
+        if(m%2!=0 && idy==0)
+            u_glob_out[idy + idx*pitch] += u_glob[idy + (m-1) + idx*pitch];
     }
-    if(m%2!=0 && idy==0)
-        u_glob_out[idy + idx*pitch] += u_glob[idy + m + idx*pitch];
 }
 
 extern "C" {
@@ -172,22 +179,28 @@ void fdiff_gpu(float *u_vals, float *temps, int n, int m, int p, int block_size_
         cudaEventRecord(start, 0);
         m_tmp = m;
         while(m_tmp > 1){
-            red_rows<<<dimGrid,dimBlock,block_size_Y*sizeof(float)>>>(u_glob, u_glob, pitch, n, m_tmp);
+            printf("m_tmp = %d\n", m_tmp);
+            red_rows<<<dimGrid,dimBlock,dimBlock.y*sizeof(float)>>>(u_glob, u_glob, pitch, n, m_tmp);
             m_tmp = (m_tmp/dimBlock.y)+(!(m_tmp%dimBlock.y)?0:1);
         }
         cudaEventRecord(finish, 0);
         cudaEventSynchronize(finish);
         cudaEventElapsedTime(&tau->calc_avg, start, finish);
-    
-        cudaMemcpy2D(temps, sizeof(float), u_glob, u_glob_size, sizeof(float), n, cudaMemcpyDeviceToHost);
+        
+        if(!mallocPitch){
+            for(i=0;i<n;i++)
+                cudaMemcpy(&temps[i], &u_glob[i*m], sizeof(float), cudaMemcpyDeviceToHost);
+        } else {
+            cudaMemcpy2D(temps, sizeof(float), &u_glob[0], u_glob_size, sizeof(float), n, cudaMemcpyDeviceToHost);
+        }
     }
 
     cudaFree(u_glob);
 }
 
 void fdiff_gpu_glob(float* u_vals, float* temps, int n, int m, int p, int block_size, Tau* tau, int red){
-	float *uold_glob, *unew_glob;
-    int i, m_tmp = m;
+	float *uold_glob, *unew_glob, *tmp;
+    int i, m_tmp;
 	cudaEvent_t start, finish;
 
     cudaEventCreate(&start);
@@ -222,24 +235,26 @@ void fdiff_gpu_glob(float* u_vals, float* temps, int n, int m, int p, int block_
     cudaEventElapsedTime(&tau->calc_GPU, start, finish);
     
     cudaEventRecord(start, 0);
-    if(p%2!=0)
-        cudaMemcpy(u_vals, unew_glob, n*m*sizeof(float), cudaMemcpyDeviceToHost);
+    if(p%2==0)
+        tmp = uold_glob;
     else
-        cudaMemcpy(u_vals, uold_glob, n*m*sizeof(float), cudaMemcpyDeviceToHost);
+        tmp = unew_glob;
+    cudaMemcpy(u_vals, tmp, n*m*sizeof(float), cudaMemcpyDeviceToHost);
     cudaEventRecord(finish, 0);
     cudaEventSynchronize(finish);
     cudaEventElapsedTime(&tau->transf_RAM, start, finish);
-
+    
+    m_tmp = m;
     if(red){    
         cudaEventRecord(start, 0);
         for( ; m_tmp>1; m_tmp>>=1)
-            red_rows_glob<<<dimGrid,dimBlock>>>(unew_glob, unew_glob, m, n, m_tmp);
+            red_rows_glob<<<dimGrid,dimBlock>>>(tmp, tmp, m, n, m_tmp);
         cudaEventRecord(finish, 0);
         cudaEventSynchronize(finish);
         cudaEventElapsedTime(&tau->calc_avg, start, finish);
+        for(i=0;i<n;i++)
+            cudaMemcpy(&temps[i], &tmp[i*m], sizeof(float), cudaMemcpyDeviceToHost);
     }
-    for(i=0;i<n;i++)
-        cudaMemcpy(&temps[i], &uold_glob[i*m], sizeof(float), cudaMemcpyDeviceToHost);
     
     cudaFree(unew_glob); cudaFree(uold_glob);
 }

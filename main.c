@@ -70,30 +70,43 @@ int main(int argc, char **argv){
     memcpy(uglob_GPU, unew_vals, n*m*sizeof(float));
     
     if(serial){
+        gettimeofday(&start, NULL);
 	    iterate(uold, unew, p, n, m);
+        gettimeofday(&end, NULL);
+        tau1.calc_CPU = tau2.calc_CPU = (end.tv_sec-start.tv_sec)*(1E6) + (end.tv_usec - start.tv_usec);
         if(p%2==0)
             u = uold_vals;
         else
             u = unew_vals;
-	    printf("\n\n\n");
-        print_grid(u, n, m);
 	    if(a)
             red_rows(u, temps, n, m);
+	    if(m <= 10 && n <= 10)
+            printf("\n\n====================== PRINTING SERIAL GRID ======================\n");
+        else
+            printf("\n\n================== PRINTING (%dx%d OF) SERIAL GRID ==================\n",10<n?10:n,10<m?10:m);
+        print_grid(u,10<n?10:n,10<m?10:m,m);
     }
+
     if(glob){
         fdiff_gpu_glob(uglob_GPU, tempsGPU2, n, m, p, block_size, &tau2, a);
-	    printf("\n\n\n");
-        print_grid(uglob_GPU, n, m);
+	    if(m <= 10 && n <= 10)
+            printf("\n\n====================== PRINTING GPU (GLOBAL METHOD) GRID ======================\n");
+        else
+            printf("\n\n================== PRINTING (%dx%d OF) GPU (GLOBAL METHOD) GRID ==================\n",10<n?10:n,10<m?10:m);
+        print_grid(uglob_GPU,10<n?10:n,10<m?10:m,m);
     }
 
     fdiff_gpu(uGPU, tempsGPU, n, m, p, block_size, &tau1, mallocPitch, a);
-	printf("\n\n\n");
-    print_grid(uGPU, n, m);
+	if(m <= 10 && n <= 10)
+        printf("\n\n====================== PRINTING GPU (SHARED METHOD)  GRID ======================\n");
+    else
+        printf("\n\n================== PRINTING (%dx%d OF) GPU (SHARED METHOD) GRID ==================\n",10<n?10:n,10<m?10:m);
+    print_grid(uGPU,10<n?10:n,10<m?10:m,m);
     
     float SSE = sse(temps, tempsGPU, n);
     int i;
-    for(i=0;i<n;i++){
-        printf("temps[%d] = %f, tempsGPU[%d] = %f, tempsGPUglob[%d]=%f\n",i,temps[i],i,tempsGPU[i],i,tempsGPU[i]);
+    for(i=0;i<(n<10?n:10);i++){
+        printf("temps[%d] = %f, tempsGPU[%d] = %f, tempsGPUglob[%d]=%f\n",i,temps[i],i,tempsGPU[i],i,tempsGPU2[i]);
     } 
     printf("SSE of temps = %f\n",SSE);
 
