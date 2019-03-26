@@ -7,8 +7,8 @@
 #include "findiff.h"
 #include "radiator.h"
 
-extern void fdiff_gpu(float* u_vals, float* temps, int n, int m, int p, int block_size_Y, Tau* tau, int mallocPitch, int red);
-extern void fdiff_gpu_glob(float* u_vals, float* temps, int n, int m, int p, int block_size, Tau* tau, int red);
+extern void fdiff_gpu(double* u_vals, double* temps, int n, int m, int p, int block_size_Y, Tau* tau, int mallocPitch, int red);
+extern void fdiff_gpu_glob(double* u_vals, double* temps, int n, int m, int p, int block_size, Tau* tau, int red);
 
 int is_empty(FILE* file);
 void write_times(char* fname, int n, int m, int p, int block_size, Tau tau, int GPU);
@@ -16,8 +16,8 @@ void write_times(char* fname, int n, int m, int p, int block_size, Tau tau, int 
 int main(int argc, char **argv){
 	int m = 32, n = 32, p = 10, block_size = 16;
 	int t = 0, w = 0, a = 0, option = 0, serial = 0, mallocPitch = 1, glob = 0;
-	float **uold, **unew;
-	float *u, *uold_vals, *unew_vals, *temps, *uGPU, *tempsGPU, *uglob_GPU, *tempsGPU2;
+	double **uold, **unew;
+	double *u, *uold_vals, *unew_vals, *temps, *uGPU, *tempsGPU, *uglob_GPU, *tempsGPU2;
 	struct timeval start, end;
 	Tau tau_shared, tau_glob;
 
@@ -55,15 +55,15 @@ int main(int argc, char **argv){
 	
     ///////////////////////// SETUP //////////////////////////////////////
 	
-    uold = (float**)malloc(n*sizeof(float*));
-	unew = (float**)malloc(n*sizeof(float*));
-	uold_vals = (float*)calloc(n*m,sizeof(float));
-	unew_vals = (float*)calloc(n*m,sizeof(float));
-	uGPU = (float*)calloc(n*m,sizeof(float));
-    uglob_GPU = (float*)calloc(n*m,sizeof(float));
-    temps = (float*)calloc(n, sizeof(float));	
-    tempsGPU = (float*)calloc(n, sizeof(float));	
-    tempsGPU2 = (float*)calloc(n, sizeof(float));	
+    uold = (double**)malloc(n*sizeof(double*));
+	unew = (double**)malloc(n*sizeof(double*));
+	uold_vals = (double*)calloc(n*m,sizeof(double));
+	unew_vals = (double*)calloc(n*m,sizeof(double));
+	uGPU = (double*)calloc(n*m,sizeof(double));
+    uglob_GPU = (double*)calloc(n*m,sizeof(double));
+    temps = (double*)calloc(n, sizeof(double));	
+    tempsGPU = (double*)calloc(n, sizeof(double));	
+    tempsGPU2 = (double*)calloc(n, sizeof(double));	
 	
     init_mat(uold, uold_vals, n, m);	
 	init_mat(unew, unew_vals, n, m);	
@@ -71,8 +71,8 @@ int main(int argc, char **argv){
 	apply_bounds(unew, n, 2, &fleft, &fright, &fzero, &fzero);
 	apply_bounds(uold, n, 2, &fleft, &fright, &fzero, &fzero);
     
-    memcpy(uGPU, unew_vals, n*m*sizeof(float));
-    memcpy(uglob_GPU, unew_vals, n*m*sizeof(float));
+    memcpy(uGPU, unew_vals, n*m*sizeof(double));
+    memcpy(uglob_GPU, unew_vals, n*m*sizeof(double));
     //////////////////////////////////////////////////////////////////////
     
     ///////////////////////// SERIAL /////////////////////////////////////
@@ -194,9 +194,9 @@ int main(int argc, char **argv){
                         tau_glob.transf_RAM, tau_glob.transf_RAM/tau_shared.transf_RAM);
         }
         if(serial){
-            float SSEt = sse(temps, tempsGPU, n);
-            float SSE2 = sse(uglob_GPU, u, m*n);
-            float SSE = sse(uGPU, u, m*n);
+            double SSEt = sse(temps, tempsGPU, n);
+            double SSE2 = sse(uglob_GPU, u, m*n);
+            double SSE = sse(uGPU, u, m*n);
             printf(GREEN"\nSSE vals...\n"RESET);
             printf(BLUE"Overall SSE:"RESET"\t%0.8f\n",SSE);
             printf(BLUE"SSE v. Glob:"RESET"\t%0.8f\n",SSE2);
