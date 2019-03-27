@@ -1,7 +1,7 @@
-shared <- read.table("~/Documents/5615/Assignments/Assignment_2/output/GPU_sharedpitch_times.csv",header=T,sep=",")
-glob <- read.table("~/Documents/5615/Assignments/Assignment_2/output/GPU_glob_times.csv",header=T,sep=",")
-cpu <- read.table("~/Documents/5615/Assignments/Assignment_2/output/CPU_times.csv",header=T,sep=",")
-double <- read.table("~/Documents/5615/Assignments/Assignment_2/output/GPU_doubles_times.csv", header=T, sep=",")
+shared <- read.table("/home/alex/Documents/College/5615/Assignments/Assignment_2/output/GPU_sharedpitch_times.csv",header=T,sep=",")
+glob <- read.table("/home/alex/Documents/College/5615/Assignments/Assignment_2/output/GPU_glob_times.csv",header=T,sep=",")
+cpu <- read.table("/home/alex/Documents/College/5615/Assignments/Assignment_2/output/CPU_times.csv",header=T,sep=",")
+double <- read.table("/home/alex/Documents/College/5615/Assignments/Assignment_2/output/GPU_doubles_times.csv", header=T, sep=",")
 
 plotvals <- function(sharedVals, globVals, cpuVals, leg1, leg2){
     par(mfrow=c(1,1))
@@ -118,3 +118,4 @@ plotvals(shared$Total,double$Total, cpu$Total,"float","double")
 shareVglob(shared$Total,double$Total,1)
 
 max(rep(cpu$Total,each=6)/shared$Total)
+min(rep(cpu$Total,each=6)/shared$Total)
