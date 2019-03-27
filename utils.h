@@ -8,13 +8,13 @@
 #define RESET "\x1B[0m"
 
 typedef struct {
-	float calc_CPU;
-	float alloc_GPU;
-	float transf_GPU;
-	float calc_GPU;
-	float calc_avgGPU;
+    float calc_CPU;
+    float alloc_GPU;
+    float transf_GPU;
+    float calc_GPU;
+    float calc_avgGPU;
     float calc_avgCPU;
-	float transf_RAM;
+    float transf_RAM;
     float tot_GPU;
     float tot_CPU;
 } Tau;

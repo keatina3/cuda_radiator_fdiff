@@ -1,95 +1,76 @@
-<<<<<<< HEAD
-=======
-#include <stdio.h>
->>>>>>> c917ee52c29b4f0cf3f5a8867f0280edf316a78d
 #include "utils.h"
 #include "findiff_gpu.h"
 #include "findiff.h"
 
 __device__ void calc_iterate(double *unew, double *uold, int n, int m, int idx, int idy, int ind){
-	if(1<idy && idy<m){
-		if(idx<n){
-			unew[ind] = (1.9*uold[ind-2] + 1.5*uold[ind-1] +
-                            uold[ind] + 0.5*uold[ind+1] + 0.1*uold[ind+2]);
-			unew[ind] /= (double)(5.0);
-		}
-	}
-<<<<<<< HEAD
-}
-
-__device__ void glob_shared_cpy(double *u_glob, double *unew, double *uold, int pitch, int n, int m, int idx, int idy, int ind){
-=======
-	//__syncthreads();
-}
-
-__device__ void glob_shared_cpy(double *u_glob, double *unew, double *uold, int pitch, int n, int m, int idx, int idy, int ind){
-	// READING DATA FROM GLOBAL MEMORY TO SHARED //
->>>>>>> c917ee52c29b4f0cf3f5a8867f0280edf316a78d
-    if(idy<m && idx<n){
-		if(threadIdx.y==0 && 0<blockIdx.y){
-			unew[ind-2] = u_glob[(idy-2) + idx*pitch];
-			unew[ind-1] = u_glob[(idy-1) + idx*pitch];	
-			uold[ind-2] = unew[ind-2];
-			uold[ind-1] = unew[ind-1];
-		}
-
-		unew[ind] = u_glob[idy+idx*pitch];
-		uold[ind] = unew[ind];
-			
-		if(threadIdx.y==(blockDim.y-1) || idy==(m-1)){
-			unew[ind+1] = u_glob[(idy+1)%m + idx*pitch];
-			unew[ind+2] = u_glob[(idy+2)%m + idx*pitch];
-            uold[ind+1] = unew[ind+1];
-            uold[ind+2] = unew[ind+2];
+    if(1<idy && idy<m){
+        if(idx<n){
+            unew[ind] = (1.9*uold[ind-2] + 1.5*uold[ind-1] +
+                    uold[ind] + 0.5*uold[ind+1] + 0.1*uold[ind+2]);
+            unew[ind] /= (double)(5.0);
         }
     }
 }
 
+__device__ void glob_shared_cpy(double *u_glob, double *unew, double *uold, int pitch, int n, int m, int idx, int idy, int ind){
+        
+    if(idy<m && idx<n){
+            if(threadIdx.y==0 && 0<blockIdx.y){
+                unew[ind-2] = u_glob[(idy-2) + idx*pitch];
+                unew[ind-1] = u_glob[(idy-1) + idx*pitch];
+                uold[ind-2] = unew[ind-2];
+                uold[ind-1] = unew[ind-1];
+            }
+
+            unew[ind] = u_glob[idy+idx*pitch];
+            uold[ind] = unew[ind];
+
+            if(threadIdx.y==(blockDim.y-1) || idy==(m-1)){
+                unew[ind+1] = u_glob[(idy+1)%m + idx*pitch];
+                unew[ind+2] = u_glob[(idy+2)%m + idx*pitch];
+                uold[ind+1] = unew[ind+1];
+                uold[ind+2] = unew[ind+2];
+            }
+        }
+}
+
 __device__ void shared_glob_cpy(double *u_glob, double *unew, int pitch, int n, int m, int idx, int idy, int ind){
     if(1<idy && idy<m)
-		if(idx<n)
-		    u_glob[idy+idx*pitch] = unew[ind];
+        if(idx<n)
+            u_glob[idy+idx*pitch] = unew[ind];
 }
 
 __global__ void iterate_gpu(double *u_glob, int pitch, int n, int m){
-	int idx = blockIdx.x*blockDim.x + threadIdx.x;
-	int idy = blockIdx.y*blockDim.y + threadIdx.y;
-	int ind = threadIdx.y + 2;
+    int idx = blockIdx.x*blockDim.x + threadIdx.x;
+    int idy = blockIdx.y*blockDim.y + threadIdx.y;
+    int ind = threadIdx.y + 2;
     double *uold, *unew;
     extern __shared__ double s[];
-    
+
     unew = &(s[0]);
     uold = &(s[blockDim.y+4]);
-    
-	// initialising shared memory //
+
+    // initialising shared memory //
     glob_shared_cpy(u_glob, unew, uold, pitch, n, m, idx, idy, ind);     
-    
+
     // iterating and updating unew //
-	calc_iterate(unew, uold, n, m, idx, idy, ind);
-    
+    calc_iterate(unew, uold, n, m, idx, idy, ind);
+
     // sending vals back to global mem //
     shared_glob_cpy(u_glob, unew, pitch, n, m, idx, idy, ind);
 }
 
 __global__ void iterate_gpu_slow(double* unew_glob, double* uold_glob, int n, int m){
-	int idx = blockIdx.x*blockDim.x + threadIdx.x;
-	int idy = blockIdx.y*blockDim.y + threadIdx.y;
+    int idx = blockIdx.x*blockDim.x + threadIdx.x;
+    int idy = blockIdx.y*blockDim.y + threadIdx.y;
 
-<<<<<<< HEAD
     if(1<idy && idy<m){
-=======
-    //printf("threadId.y=%d, blockId.y=%d, threadIdx.x=%d, blockId.x=%d\n",
-    //        threadIdx.y,blockIdx.y, threadIdx.x, threadIdx.y);
-    if(1<idy && idy<m){
-        if(idy==idx==2){ printf("global[0,9] = %f\n",unew_glob[9]);}
->>>>>>> c917ee52c29b4f0cf3f5a8867f0280edf316a78d
-		if(idx<n){
-			unew_glob[idy+idx*m] = (1.9*uold_glob[(idy+idx*m)-2] + 1.5*uold_glob[(idy+idx*m)-1] +
-                        uold_glob[idy+idx*m] + 0.5*uold_glob[(idy+1)%m+idx*m] 
-                            + 0.1*uold_glob[(idy+2)%m+idx*m]);
-			unew_glob[idy+idx*m] /= (double)(5.0);
-		}
-	}
+        unew_glob[idy+idx*m] = (1.9*uold_glob[(idy+idx*m)-2] + 1.5*uold_glob[(idy+idx*m)-1] +
+                uold_glob[idy+idx*m] + 0.5*uold_glob[(idy+1)%m+idx*m] 
+                    + 0.1*uold_glob[(idy+2)%m+idx*m]);
+        unew_glob[idy+idx*m] /= (double)(5.0);
+        }
+    }
 }
 
 __global__ void red_rows(double* u_glob, double* u_glob_out, int pitch, int n, int m){
@@ -101,7 +82,7 @@ __global__ void red_rows(double* u_glob, double* u_glob_out, int pitch, int n, i
 
     if(idy<m && idx<n)
         tmp[ind] = u_glob[idy+idx*pitch];
-    
+
     disp = (1+blockIdx.y)*blockDim.y;
     i = (disp > m) ? (blockDim.y - (disp-m)):blockDim.y;
     for( ; i>1; i>>=1){
@@ -110,7 +91,7 @@ __global__ void red_rows(double* u_glob, double* u_glob_out, int pitch, int n, i
             if(ind==0 && i%2!=0)
                 tmp[ind] += tmp[ind+i-1]; 
         }
-         __syncthreads();
+        __syncthreads();
     }
     if(ind==0)
         u_glob_out[blockIdx.y + idx*pitch] = tmp[0];
@@ -132,24 +113,24 @@ void fdiff_gpu(double *u_vals, double *temps, int n, int m, int p, int block_siz
     double *u_glob;
     size_t u_glob_size;
     int i, pitch, m_tmp;
-	cudaEvent_t start, finish;
+    cudaEvent_t start, finish;
 
     cudaEventCreate(&start);
     cudaEventCreate(&finish);
-    
+
     if(!mallocPitch){
         cudaEventRecord(start, 0);
         cudaMalloc( (void**)&u_glob, n*m*sizeof(double));
         cudaEventRecord(finish, 0);
         cudaEventSynchronize(finish);
         cudaEventElapsedTime(&tau->alloc_GPU, start, finish);
-        
+
         cudaEventRecord(start,0);
         cudaMemcpy(u_glob, u_vals, n*m*sizeof(double), cudaMemcpyHostToDevice);
         cudaEventRecord(finish, 0);
         cudaEventSynchronize(finish);
         cudaEventElapsedTime(&tau->transf_GPU, start, finish);
-        
+
         pitch = m;
     } else {
         cudaEventRecord(start, 0);
@@ -157,23 +138,23 @@ void fdiff_gpu(double *u_vals, double *temps, int n, int m, int p, int block_siz
         cudaEventRecord(finish, 0);
         cudaEventSynchronize(finish);
         cudaEventElapsedTime(&tau->alloc_GPU, start, finish);
-        
+
         cudaEventRecord(start,0);
         cudaMemcpy2D(u_glob, u_glob_size, u_vals, m*sizeof(double), m*sizeof(double), n, cudaMemcpyHostToDevice);
         cudaEventRecord(finish, 0);
         cudaEventSynchronize(finish);
         cudaEventElapsedTime(&tau->transf_GPU, start, finish);
-        
+
         pitch = (int)u_glob_size/sizeof(double);
     }
 
     dim3 dimBlock(1, block_size_Y);
     dim3 dimGrid((n/dimBlock.x)+(!(n%dimBlock.x)?0:1), (m/dimBlock.y)+(!(m%dimBlock.y)?0:1));
-   
+
     cudaEventRecord(start, 0);
     for(i=0;i<p;i++)
-	    iterate_gpu<<<dimGrid,dimBlock,2*(block_size_Y+4)*sizeof(double)>>>(u_glob, pitch, n, m);
-    
+        iterate_gpu<<<dimGrid,dimBlock,2*(block_size_Y+4)*sizeof(double)>>>(u_glob, pitch, n, m);
+
     cudaEventRecord(finish, 0);
     cudaEventSynchronize(finish);
     cudaEventElapsedTime(&tau->calc_GPU, start, finish);
@@ -188,7 +169,7 @@ void fdiff_gpu(double *u_vals, double *temps, int n, int m, int p, int block_siz
     cudaEventRecord(finish, 0);
     cudaEventSynchronize(finish);
     cudaEventElapsedTime(&tau->transf_RAM, start, finish);
-    
+
     if(red){  
         m_tmp = m;
         cudaEventRecord(start, 0);
@@ -199,7 +180,7 @@ void fdiff_gpu(double *u_vals, double *temps, int n, int m, int p, int block_siz
         cudaEventRecord(finish, 0);
         cudaEventSynchronize(finish);
         cudaEventElapsedTime(&tau->calc_avgGPU, start, finish);
-        
+
         if(!mallocPitch){
             for(i=0;i<n;i++)
                 cudaMemcpy(&temps[i], &u_glob[i*m], sizeof(double), cudaMemcpyDeviceToHost);
@@ -212,13 +193,13 @@ void fdiff_gpu(double *u_vals, double *temps, int n, int m, int p, int block_siz
 }
 
 void fdiff_gpu_glob(double* u_vals, double* temps, int n, int m, int p, int block_size, Tau* tau, int red){
-	double *uold_glob, *unew_glob, *tmp;
+    double *uold_glob, *unew_glob, *tmp;
     int i, m_tmp;
-	cudaEvent_t start, finish;
+    cudaEvent_t start, finish;
 
     cudaEventCreate(&start);
     cudaEventCreate(&finish);
-    
+
     cudaEventRecord(start, 0);
     cudaMalloc( (void**)&unew_glob, n*m*sizeof(double));
     cudaMalloc( (void**)&uold_glob, n*m*sizeof(double));
@@ -232,25 +213,21 @@ void fdiff_gpu_glob(double* u_vals, double* temps, int n, int m, int p, int bloc
     cudaEventRecord(finish, 0);
     cudaEventSynchronize(finish);
     cudaEventElapsedTime(&tau->transf_GPU, start, finish);
-    
+
     dim3 dimBlock(1, block_size);
     dim3 dimGrid((n/dimBlock.x)+(!(n%dimBlock.x)?0:1), (m/dimBlock.y)+(!(m%dimBlock.y)?0:1));
-    
+
     cudaEventRecord(start, 0);
     for(i=0;i<p;i++){
-<<<<<<< HEAD
-=======
-        //printf("i = %d\n",i);
->>>>>>> c917ee52c29b4f0cf3f5a8867f0280edf316a78d
-        if(i%2==0)
-	        iterate_gpu_slow<<<dimGrid,dimBlock>>>(unew_glob, uold_glob, n, m);
-        else
-	        iterate_gpu_slow<<<dimGrid,dimBlock>>>(uold_glob, unew_glob, n, m);
+            if(i%2==0)
+                iterate_gpu_slow<<<dimGrid,dimBlock>>>(unew_glob, uold_glob, n, m);
+            else
+                iterate_gpu_slow<<<dimGrid,dimBlock>>>(uold_glob, unew_glob, n, m);
     }
     cudaEventRecord(finish, 0);
     cudaEventSynchronize(finish);
     cudaEventElapsedTime(&tau->calc_GPU, start, finish);
-    
+
     cudaEventRecord(start, 0);
     if(p%2==0)
         tmp = uold_glob;
@@ -260,7 +237,7 @@ void fdiff_gpu_glob(double* u_vals, double* temps, int n, int m, int p, int bloc
     cudaEventRecord(finish, 0);
     cudaEventSynchronize(finish);
     cudaEventElapsedTime(&tau->transf_RAM, start, finish);
-    
+
     m_tmp = m;
     if(red){    
         cudaEventRecord(start, 0);
@@ -272,7 +249,7 @@ void fdiff_gpu_glob(double* u_vals, double* temps, int n, int m, int p, int bloc
         for(i=0;i<n;i++)
             cudaMemcpy(&temps[i], &tmp[i*m], sizeof(double), cudaMemcpyDeviceToHost);
     }
-    
+
     cudaFree(unew_glob); cudaFree(uold_glob);
 }
 }
