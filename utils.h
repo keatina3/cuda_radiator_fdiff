@@ -2,9 +2,9 @@
 #define _UTILS_H
 
 #define RED  "\x1B[91m"     // for colour setting in print
-#define GREEN  "\x1B[92m"     // for colour setting in print
-#define BLUE  "\x1B[94m"     // for colour setting in print
-#define MAG  "\x1B[95m"     // for colour setting in print
+#define GREEN  "\x1B[92m"
+#define BLUE  "\x1B[94m"
+#define MAG  "\x1B[95m"
 #define RESET "\x1B[0m"
 
 typedef struct {

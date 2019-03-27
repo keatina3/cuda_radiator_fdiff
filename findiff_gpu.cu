@@ -7,7 +7,7 @@ __device__ void calc_iterate(float *unew, float *uold, int n, int m, int idx, in
 	if(1<idy && idy<m){
 		if(idx<n){
 			unew[ind] = (1.9*uold[ind-2] + 1.5*uold[ind-1] +
-                            uold[ind] + 0.5*uold[ind+1] + 0.1*uold[ind+2]);
+                uold[ind] + 0.5*uold[ind+1] + 0.1*uold[ind+2]);
 			unew[ind] /= (float)(5.0);
 		}
 	}
@@ -59,7 +59,7 @@ __global__ void iterate_gpu(float *u_glob, int pitch, int n, int m){
 	// initialising shared memory //
     glob_shared_cpy(u_glob, unew, uold, pitch, n, m, idx, idy, ind);     
     
-   	// iterating and updating unew //
+    // iterating and updating unew //
 	calc_iterate(unew, uold, n, m, idx, idy, ind);
     
     // sending vals back to global mem //
@@ -73,8 +73,8 @@ __global__ void iterate_gpu_slow(float* unew_glob, float* uold_glob, int n, int 
     if(1<idy && idy<m){
 		if(idx<n){
 			unew_glob[idy+idx*m] = (1.9*uold_glob[(idy+idx*m)-2] + 1.5*uold_glob[(idy+idx*m)-1] +
-    	                   uold_glob[idy+idx*m] + 0.5*uold_glob[(idy+1)%m+idx*m] 
-                            + 0.1*uold_glob[(idy+2)%m+idx*m]);
+    	                         uold_glob[idy+idx*m] + 0.5*uold_glob[(idy+1)%m+idx*m] 
+                                    + 0.1*uold_glob[(idy+2)%m+idx*m]);
 			unew_glob[idy+idx*m] /= (float)(5.0);
 		}
 	}

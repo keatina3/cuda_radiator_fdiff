@@ -23,6 +23,7 @@ void apply_bounds(float **u, int nx, int ny,
 		u[nx-1][i] = ubound((nx-1),i,nx,ny);
 	}
 }
+
 // serial propagation code //
 void iterate(float **uold, float **unew, int p, int nx, int ny){
 	int i,j,k;
@@ -42,6 +43,7 @@ void iterate(float **uold, float **unew, int p, int nx, int ny){
 	}
     unew=uold; 
 }
+
 // reduce grid to one tmp //
 float get_grid_avg(float *u, int nx, int ny){
 	float *row_sum, temp;

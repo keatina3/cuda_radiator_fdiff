@@ -113,6 +113,8 @@ int main(int argc, char **argv){
         print_grid(u,10<n?10:n,10<m?10:m,m);
         printf(MAG"=============================================================="
                             "===========================\n\n"MAG);
+        if(w)
+            write_times("CPU_times.csv", n, m, p, block_size, tau_shared, 0);
     }
     //////////////////////////////////////////////////////////////////////
 
@@ -133,6 +135,8 @@ int main(int argc, char **argv){
         print_grid(uglob_GPU,10<n?10:n,10<m?10:m,m);
         printf(MAG"=============================================================="
                             "===========================\n\n"RESET);
+        if(w)
+            write_times("GPU_glob_times.csv", n, m, p, block_size, tau_glob, 1);
     }
     //////////////////////////////////////////////////////////////////////
     
@@ -155,7 +159,13 @@ int main(int argc, char **argv){
     //////////////////////////////////////////////////////////////////////
     
     ///////////////////////// RESULTS ////////////////////////////////////
-    ///////////////////////// RESULTS ////////////////////////////////////
+    
+    if(w){
+        if(mallocPitch)
+            write_times("GPU_sharedpitch_times.csv", n, m, p, block_size, tau_shared, 1);
+        else
+            write_times("GPU_sharednopitch_times.csv", n, m, p, block_size, tau_shared, 1);
+    }
     
     if(t){
         printf(MAG"\n========================= RESULTS ==========================\n\n"RESET);

@@ -40,7 +40,11 @@ void iterate(double **uold, double **unew, int p, int nx, int ny){
 		uold = unew;
 		unew = tmp;
 	}
+<<<<<<< HEAD
 	unew=uold; 
+=======
+    unew=uold; 
+>>>>>>> c917ee52c29b4f0cf3f5a8867f0280edf316a78d
 }
 
 double get_grid_avg(double *u, int nx, int ny){

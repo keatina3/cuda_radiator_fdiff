@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+#include <stdio.h>
+>>>>>>> c917ee52c29b4f0cf3f5a8867f0280edf316a78d
 #include "utils.h"
 #include "findiff_gpu.h"
 #include "findiff.h"
@@ -10,9 +14,17 @@ __device__ void calc_iterate(double *unew, double *uold, int n, int m, int idx, 
 			unew[ind] /= (double)(5.0);
 		}
 	}
+<<<<<<< HEAD
 }
 
 __device__ void glob_shared_cpy(double *u_glob, double *unew, double *uold, int pitch, int n, int m, int idx, int idy, int ind){
+=======
+	//__syncthreads();
+}
+
+__device__ void glob_shared_cpy(double *u_glob, double *unew, double *uold, int pitch, int n, int m, int idx, int idy, int ind){
+	// READING DATA FROM GLOBAL MEMORY TO SHARED //
+>>>>>>> c917ee52c29b4f0cf3f5a8867f0280edf316a78d
     if(idy<m && idx<n){
 		if(threadIdx.y==0 && 0<blockIdx.y){
 			unew[ind-2] = u_glob[(idy-2) + idx*pitch];
@@ -63,7 +75,14 @@ __global__ void iterate_gpu_slow(double* unew_glob, double* uold_glob, int n, in
 	int idx = blockIdx.x*blockDim.x + threadIdx.x;
 	int idy = blockIdx.y*blockDim.y + threadIdx.y;
 
+<<<<<<< HEAD
     if(1<idy && idy<m){
+=======
+    //printf("threadId.y=%d, blockId.y=%d, threadIdx.x=%d, blockId.x=%d\n",
+    //        threadIdx.y,blockIdx.y, threadIdx.x, threadIdx.y);
+    if(1<idy && idy<m){
+        if(idy==idx==2){ printf("global[0,9] = %f\n",unew_glob[9]);}
+>>>>>>> c917ee52c29b4f0cf3f5a8867f0280edf316a78d
 		if(idx<n){
 			unew_glob[idy+idx*m] = (1.9*uold_glob[(idy+idx*m)-2] + 1.5*uold_glob[(idy+idx*m)-1] +
                         uold_glob[idy+idx*m] + 0.5*uold_glob[(idy+1)%m+idx*m] 
@@ -219,6 +238,10 @@ void fdiff_gpu_glob(double* u_vals, double* temps, int n, int m, int p, int bloc
     
     cudaEventRecord(start, 0);
     for(i=0;i<p;i++){
+<<<<<<< HEAD
+=======
+        //printf("i = %d\n",i);
+>>>>>>> c917ee52c29b4f0cf3f5a8867f0280edf316a78d
         if(i%2==0)
 	        iterate_gpu_slow<<<dimGrid,dimBlock>>>(unew_glob, uold_glob, n, m);
         else
