@@ -4,11 +4,7 @@ NVCC = nvcc
 
 #flags 
 CFLAGS = -Wall
-<<<<<<< HEAD
 NVCCFLAGS = -g -G --use_fast_math
-=======
-NVCCFLAGS = -g -G --use_fast_math -arch=sm_30
->>>>>>> c917ee52c29b4f0cf3f5a8867f0280edf316a78d
 
 #files
 OBJECTS = main.o findiff.o radiator.o utils.o
