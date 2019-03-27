@@ -116,3 +116,5 @@ shareVglob(shared$Transfer.RAM,glob$Transfer.RAM,1)
 
 plotvals(shared$Total,double$Total, cpu$Total,"float","double")
 shareVglob(shared$Total,double$Total,1)
+
+max(rep(cpu$Total,each=6)/shared$Total)
