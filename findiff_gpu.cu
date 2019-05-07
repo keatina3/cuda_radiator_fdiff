@@ -81,7 +81,7 @@ __global__ void iterate_gpu_slow(float* unew_glob, float* uold_glob, int n, int 
 }
 
 // optimised reduce kernel //
-__global__ void red_rows(float* u_glob, float* u_glob_out, int pitch, int n, int m){
+__global__ void red_rows(float* u_glob, float* u_glob_out, int pitch, int n, int m, int m_tot){
     int idx = blockIdx.x*blockDim.x + threadIdx.x;
     int idy = blockIdx.y*blockDim.y + threadIdx.y;
     int ind = threadIdx.y;
@@ -91,7 +91,8 @@ __global__ void red_rows(float* u_glob, float* u_glob_out, int pitch, int n, int
     // reading from global mem to shared //
     if(idy<m && idx<n)
         tmp[ind] = u_glob[idy+idx*pitch];
-
+    __synchthreads();
+    
     // for loop below performs binary reduction on each block //
 
     // disp variable to check if threadId @ end of block > m //
@@ -107,7 +108,9 @@ __global__ void red_rows(float* u_glob, float* u_glob_out, int pitch, int n, int
         }
         __syncthreads();				// sync each block
     }
-    if(ind==0)							// write the #blocks values back to global mem //
+    if(ind==0){							// write the #blocks values back to global mem //
+        if(m==1)
+            tmp[0] *= 1.0/(float)m_tot;        
         u_glob_out[blockIdx.y + idx*pitch] = tmp[0];
 }
 
@@ -197,7 +200,7 @@ extern "C" {
             // reduce kernel //
             cudaEventRecord(start, 0);
             while(m_tmp > 1){
-                red_rows<<<dimGrid,dimBlock,dimBlock.y*sizeof(float)>>>(u_glob, u_glob, pitch, n, m_tmp);
+                red_rows<<<dimGrid,dimBlock,dimBlock.y*sizeof(float)>>>(u_glob, u_glob, pitch, n, m_tmp, m);
                 m_tmp = (m_tmp/dimBlock.y)+(!(m_tmp%dimBlock.y)?0:1);	// reduced by order blockDim //
             }
             cudaEventRecord(finish, 0);
